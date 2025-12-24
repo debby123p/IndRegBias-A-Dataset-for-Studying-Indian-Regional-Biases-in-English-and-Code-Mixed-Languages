@@ -74,7 +74,7 @@ def load_model_and_tokenizer():
     print("Logging into Hugging Face Hub...")
     login(token=HF_API_KEY)
 
-    print(f"Loading model: {MODEL_ID} in full precision (bfloat16)...")
+    print(f"Loading model: {MODEL_ID} in full precision.")
     model = AutoModelForCausalLM.from_pretrained(
         MODEL_ID,
         device_map="auto",
