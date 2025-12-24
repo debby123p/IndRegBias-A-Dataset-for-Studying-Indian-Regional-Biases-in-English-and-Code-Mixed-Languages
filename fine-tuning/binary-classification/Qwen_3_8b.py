@@ -1,5 +1,4 @@
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 import torch
 import pandas as pd
 import numpy as np
@@ -19,6 +18,8 @@ from tqdm import tqdm
 import gc
 import shutil
 import random
+
+os.environ["CUDA_VISIBLE_DEVICES"] = "" # Target GPU node
 
 CONFIG = {
     "model_id": "Qwen/Qwen3-8B", # Model ID
@@ -198,7 +199,7 @@ def parse_model_response(response_text):
     if "0" in response_text:
         return 0
         
-    return 0 
+    return 0 # Default
 
 def evaluate_fold(fold_idx, adapter_path, val_df, tokenizer):
     # Evaluates the trained fold model.
@@ -234,7 +235,8 @@ def evaluate_fold(fold_idx, adapter_path, val_df, tokenizer):
         
         pred_int = parse_model_response(response)
         predictions.append(pred_int)
-s
+
+    # Metrics
     report = classification_report(true_labels_int, predictions, target_names=["Non-Regional Bias (0)", "Regional Bias (1)"], output_dict=True)
     f1_macro = report['macro avg']['f1-score']
     acc = accuracy_score(true_labels_int, predictions)
