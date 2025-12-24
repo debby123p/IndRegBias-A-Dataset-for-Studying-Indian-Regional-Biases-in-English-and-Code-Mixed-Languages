@@ -4,7 +4,7 @@ import pandas as pd
 import re
 from tqdm import tqdm
 from huggingface_hub import login
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+from transformers import AutoModelForCausalLM, AutoTokenizer
 from sklearn.metrics import classification_report, confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -15,12 +15,12 @@ TARGET_GPU = "" # Target GPU node
 INPUT_CSV_PATH = "" # Dataset file path
 OUTPUT_DIR = "" # Output Directory
 COMMENT_COLUMN_NAME = "comment"
-GROUND_TRUTH_COLUMN_NAME = "level-1"
-BATCH_SIZE = 16
+GROUND_TRUTH_COLUMN_NAME = "is RB?"
+BATCH_SIZE = 16 
 
-MODEL_ID = "deepseek-ai/DeepSeek-R1-Distill-Llama-8B"
+MODEL_ID = "deepseek-ai/DeepSeek-R1-Distill-Llama-8B" # Model ID
 
-SYSTEM_PROMPT = """
+MODEL_PROMPT = """
 You are an expert in identifying regional biases in social media comments about Indian states and regions. Your task is to classify whether a comment contains regional biases or not.
 
 Task: Classify the given comment as either "REGIONAL BIAS" (1) or "NON-REGIONAL BIAS" (0).
@@ -61,23 +61,24 @@ Your response must include a brief line of reasoning followed by the final class
 """
 
 def setup_environment():
-    """Sets up GPU visibility and creates the output directory."""
+    # Sets up GPU visibility and creates the output directory
     print(f"Restricting execution to GPU: {TARGET_GPU}")
     os.environ["CUDA_VISIBLE_DEVICES"] = TARGET_GPU
+    
     if not os.path.exists(OUTPUT_DIR):
+        print(f"Creating output directory: {OUTPUT_DIR}")
         os.makedirs(OUTPUT_DIR)
 
 def load_model_and_tokenizer():
-    """Handles authentication and loads the model in INT8 precision."""
+    # Handles authentication and loads the model in full precision
     print("Logging into Hugging Face Hub...")
     login(token=HF_API_KEY)
 
-    quantization_config = BitsAndBytesConfig(load_in_8bit=True)
-
-    print(f"Loading model: {MODEL_ID} in INT8 precision...")
+    print(f"Loading model: {MODEL_ID} in full precision (bfloat16)...")
+    
     model = AutoModelForCausalLM.from_pretrained(
         MODEL_ID,
-        quantization_config=quantization_config,
+        torch_dtype=torch.bfloat16, 
         device_map="auto"
     )
 
@@ -90,9 +91,10 @@ def load_model_and_tokenizer():
     return model, tokenizer
 
 def parse_single_response(response_text):
-    """Robustly parses a single model response text to ensure a 0 or 1 output."""
+    # Robustly parses a single model response to ensure a 0 or 1 output
     prediction = -1
     reasoning = response_text.split("Classification:")[0].strip() or response_text
+
     match = re.search(r'Classification:\s*([01])', response_text)
     if match:
         prediction = int(match.group(1))
@@ -109,24 +111,30 @@ def parse_single_response(response_text):
     return prediction, reasoning
 
 def classify_batch(comments, model, tokenizer):
-    """Generates classifications for a batch of comments."""
+    # Generates classifications for a batch of comments.
     messages = [
         [
-            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "system", "content": MODEL_PROMPT},
             {"role": "user", "content": f"Comment: \"{comment}\"\n\nYour response must include a brief line of reasoning followed by the final classification in the format \"Classification: [0 or 1]\"."}
         ] for comment in comments
     ]
     
     prompts = [tokenizer.apply_chat_template(msg, tokenize=False, add_generation_prompt=True) for msg in messages]
+    
     inputs = tokenizer(prompts, return_tensors="pt", padding=True, truncation=True, max_length=1024).to(model.device)
     
     results = []
-    outputs = None
     try:
         with torch.no_grad():
-            outputs = model.generate(**inputs, max_new_tokens=150, do_sample=False, pad_token_id=tokenizer.eos_token_id)
+            outputs = model.generate(
+                **inputs, 
+                max_new_tokens=400, # Increased to allow for "Thinking" process
+                do_sample=False, 
+                pad_token_id=tokenizer.eos_token_id
+            )
         
         response_texts = tokenizer.batch_decode(outputs[:, inputs.input_ids.shape[1]:], skip_special_tokens=True)
+
         for text in response_texts:
             results.append(parse_single_response(text))
 
@@ -134,18 +142,21 @@ def classify_batch(comments, model, tokenizer):
         print(f"An error occurred during model generation for a batch: {e}")
         results = [(0, f"Error: {e}")] * len(comments)
     
-    del inputs
-    if outputs is not None:
-        del outputs
+    del inputs, outputs
     gc.collect()
     torch.cuda.empty_cache()
     
     return results
 
 def generate_evaluation_outputs(df):
-    """Generates and saves the classification report and confusion matrix."""
+    # Generates and saves the classification report and confusion matrix
+    if df.empty:
+        print("Dataframe is empty. Skipping evaluation.")
+        return
+
     y_true = df[GROUND_TRUTH_COLUMN_NAME].astype(int)
     y_pred = df['predicted_label'].astype(int)
+
     report = classification_report(y_true, y_pred, target_names=["NON-REGIONAL BIAS (0)", "REGIONAL BIAS (1)"], zero_division=0)
     report_path = os.path.join(OUTPUT_DIR, "classification_report.txt")
     with open(report_path, "w") as f:
@@ -167,16 +178,20 @@ def generate_evaluation_outputs(df):
     print(f"Confusion matrix saved to {cm_path}")
 
 def main():
-    """Main function to orchestrate the entire classification process."""
+    # Main function to orchestrate the entire classification process
     setup_environment()
     model, tokenizer = load_model_and_tokenizer()
     
     print(f"\nReading input CSV from: {INPUT_CSV_PATH}")
-    df = pd.read_csv(INPUT_CSV_PATH)
-    
+    try:
+        df = pd.read_csv(INPUT_CSV_PATH)
+    except FileNotFoundError:
+        print(f"Error: The file {INPUT_CSV_PATH} was not found.")
+        return
+
     if COMMENT_COLUMN_NAME not in df.columns:
         raise ValueError(f"Comment column '{COMMENT_COLUMN_NAME}' not found in the CSV.")
-    
+
     df[COMMENT_COLUMN_NAME] = df[COMMENT_COLUMN_NAME].astype(str).fillna("")
     comments_to_process = df[COMMENT_COLUMN_NAME].tolist()
     
@@ -191,7 +206,7 @@ def main():
     
     df['predicted_label'] = [res[0] for res in all_results]
     df['model_reasoning'] = [res[1] for res in all_results]
-    
+
     output_csv_path = os.path.join(OUTPUT_DIR, "classification_results.csv")
     df.to_csv(output_csv_path, index=False)
     print(f"\nClassification complete. Results saved to {output_csv_path}")
