@@ -20,7 +20,7 @@ BATCH_SIZE = 16
 
 MODEL_ID = "google/gemma-1.1-7b-it"
 
-SYSTEM_PROMPT = """
+MODEL_PROMPT = """
 You are an expert in identifying regional biases in social media comments about Indian states and regions. Your task is to classify whether a comment contains regional biases or not.
 
 Task: Classify the given comment as either "REGIONAL BIAS" (1) or "NON-REGIONAL BIAS" (0).
@@ -114,7 +114,7 @@ def classify_batch(comments, model, tokenizer):
     # Generates classifications for a batch of comments.
     messages = [
         [
-            {"role": "user", "content": f"{SYSTEM_PROMPT}\n\nComment: \"{comment}\"\n\nBased on your analysis, provide your reasoning and final classification."}
+            {"role": "user", "content": f"{MODEL_PROMPT}\n\nComment: \"{comment}\"\n\nBased on your analysis, provide your reasoning and final classification."}
         ] for comment in comments
     ]
     
