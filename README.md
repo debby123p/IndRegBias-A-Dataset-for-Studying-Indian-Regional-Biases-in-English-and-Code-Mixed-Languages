@@ -116,23 +116,23 @@ Eight prominent LLMs were selected for their instruction-following and reasoning
 | Precision | 0.70 | **0.82** | 0.69 | **0.73** | 0.68 | **0.76** | 0.71 | **0.75** |
 | F1-Score | **0.78** | 0.74 | 0.76 | **0.81** | 0.78 | **0.79** | 0.79 | **0.81** |
 
-   After looking through the inferences of the above experiment, we proceeded with experiments on the entire dataset with the type of support we have provided in Exp-2, Exp-3, and Exp-4, as we got improved performances in comparison to the zero-shot results. The codes for which are , which is available in [Few-shot-binary-classification](https://github.com/debby123p/CAN-LARGE-LANGUAGE-MODELS-DETECT-INDIAN-REGIONAL-BIAS-DATASET-ANALYSIS/tree/main/few-shot).
+   After looking through the inferences of the above experiment, we proceeded with experiments on the entire dataset with the type of support we have provided in Exp-2, Exp-3, and Exp-4, as we got improved performances in comparison to the zero-shot results. The codes for which are, which is available in [Few-shot-binary-classification](https://github.com/debby123p/CAN-LARGE-LANGUAGE-MODELS-DETECT-INDIAN-REGIONAL-BIAS-DATASET-ANALYSIS/tree/main/few-shot).
 
 | | **Exp-1** <br> (50 R) | | **Exp-2** <br> (25R/25N) | | **Exp-3** <br> (30R/20N) | |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
 | **Metric** | **ZS** | **FS** | **ZS** | **FS** | **ZS** | **FS** |
 | _**Non-regional biases**_ | | | | | | |
-| Precision | 0.80 | **0.87** | **0.79** | 0.71 | **0.79** | 0.73 |
+| Precision | 0.80 | **0.87** | **0.79** | 0.71 | **0.80** | **0.80** |
 | F1-Score | 0.69 | **0.75** | 0.69 | **0.78** | 0.69 | **0.79** |
 | _**Regional Biases**_ | | | | | | |
 | Precision | 0.70 | **0.74** | 0.71 | **0.85** | 0.71 | **0.84** |
-| F1-Score | 0.77 | **0.82** | **0.77** | 0.75 | **0.78** | 0.77 |
+| F1-Score | 0.77 | **0.82** | **0.77** | 0.75 | 0.78 | **0.81** |
 
-   The few-shots results show improvement over the zero-shot results as present in the above table. The experiment with providing only 50 regional biases as support has outperformed other few-shot experiments. Also, balanced and unbalanced set of support show improvement in performance in comparison to the zero-shot.   
+   The few-shot results show improvement over the zero-shot results, as presented in the above table. The experiment with providing only 50 regional biases as support has outperformed other few-shot experiments. Also, a balanced and an unbalanced set of support shows improvement in performance in comparison to the zero-shot.   
 
 5) Fine-Tuning Results
 
-   Fine-tuned Qwen3_32b has emerged as the absolute best performer, achieving high reliability with F1-scores and precision nearing 0.90 for both bias categories. Followed by Qwen3_8b model which has also performed better than zero-shot, achieving near 0.90 scores for precison and F1-scores. The codes for which are available in [binary-classification](https://github.com/debby123p/CAN-LARGE-LANGUAGE-MODELS-DETECT-INDIAN-REGIONAL-BIAS-DATASET-ANALYSIS/tree/main/fine-tuning).
+   Fine-tuned Qwen3_32b has emerged as the absolute best performer, achieving high reliability with F1-scores and precision nearing 0.90 for both bias categories. Followed by Qwen3_8b model, which has also performed better than zero-shot, achieving near 0.90 scores for precision and F1-scores. The codes for which are available in [binary-classification](https://github.com/debby123p/CAN-LARGE-LANGUAGE-MODELS-DETECT-INDIAN-REGIONAL-BIAS-DATASET-ANALYSIS/tree/main/fine-tuning).
 
 | | **Qwen3-8B** | | **Qwen3-32B** | |
 | :--- | :---: | :---: | :---: | :---: |
@@ -148,7 +148,7 @@ Eight prominent LLMs were selected for their instruction-following and reasoning
 
 1) Zero-Shot Results
    
-We evaluated the top-performing models on severity classification (Mild, Moderate, Severe). Mistral-7B-v0.3 achieved the best performance, securing the highest precision for 'Mild' and 'Moderate' categories (0.64) and the top F1-score for 'Severe'. Qwen3-8B showed competitive results, particularly in the 'Severe' category, outperforming Mistral-Nemo. Conversely, Qwen3-32B struggled with 'Mild' and 'Severe' classifications, showing strength only in the 'Moderate' category. The codes for which are , which is available in [zero-shot-multi-classification](https://github.com/debby123p/IndRegBias-A-Benchmark-for-Studying-Indian-Regional-Biases-in-English-and-Code-Mixed-Social-Media-I/tree/main/zero_shot/zero-shot-multi-class-classification).
+We evaluated the top-performing models on severity classification (Mild, Moderate, Severe). Mistral-7B-v0.3 achieved the best performance, securing the highest precision for 'Mild' and 'Moderate' categories (0.64) and the top F1-score for 'Severe'. Qwen3-8B showed competitive results, particularly in the 'Severe' category, outperforming Mistral-Nemo. Conversely, Qwen3-32B struggled with 'Mild' and 'Severe' classifications, showing strength only in the 'Moderate' category. The codes for which are, which is available in [zero-shot-multi-classification](https://github.com/debby123p/IndRegBias-A-Benchmark-for-Studying-Indian-Regional-Biases-in-English-and-Code-Mixed-Social-Media-I/tree/main/zero_shot/zero-shot-multi-class-classification).
 
 | Model | Mild (P) | Mild (F1) | Mod. (P) | Mod. (F1) | Severe (P) | Severe (F1) |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -160,7 +160,7 @@ We evaluated the top-performing models on severity classification (Mild, Moderat
 
 3) Few-Shot Results
 
-We evaluated Mistral-7B-v0.3 using three few-shot strategies. Experiment B (30 balanced examples) yielded the best stability, significantly boosting the F1-score for 'Moderate' comments (0.54 $\to$ 0.64) and Precision for 'Mild' comments. Experiment C (imbalanced support) achieved the highest precision for 'Severe' bias (0.48) but suffered a significant drop in F1-score (0.31), indicating the model became overly conservative. Small support sets (Exp A) showed minimal improvement. The codes for which are , which is available in [Few-shot-multi-classification](https://github.com/debby123p/IndRegBias-A-Benchmark-for-Studying-Indian-Regional-Biases-in-English-and-Code-Mixed-Social-Media-I/tree/main/few-shot/Few-shot-multi-class-clasification).
+We evaluated Mistral-7B-v0.3 using three few-shot strategies. Experiment B (30 balanced examples) yielded the best stability, significantly boosting the F1-score for 'Moderate' comments (0.54 $\to$ 0.64) and Precision for 'Mild' comments. Experiment C (imbalanced support) achieved the highest precision for 'Severe' bias (0.48) but suffered a significant drop in F1-score (0.31), indicating the model became overly conservative. Small support sets (Exp A) showed minimal improvement. The codes for which are, which is available in [Few-shot-multi-classification](https://github.com/debby123p/IndRegBias-A-Benchmark-for-Studying-Indian-Regional-Biases-in-English-and-Code-Mixed-Social-Media-I/tree/main/few-shot/Few-shot-multi-class-clasification).
 
 | Experiment | Support Set | Class | Zero-Shot (P / F1) | Few-Shot (P / F1) |
 | :--- | :--- | :--- | :---: | :---: |
@@ -176,7 +176,7 @@ We evaluated Mistral-7B-v0.3 using three few-shot strategies. Experiment B (30 b
 
 4) Fine-Tuning Results
 
-We fine-tuned Mistral-7B-v0.3 to address limitations in few-shot learning. The fine-tuned model demonstrated significant improvements across all severity classes compared to the zero-shot baseline. The most substantial gains were observed in the 'Severe' category (Precision increased from 0.360 to 0.586), confirming that training on curated data effectively enhances the detection of high-severity regional bias. The codes for which are , which is available in [multi-class classification](https://github.com/debby123p/IndRegBias-A-Benchmark-for-Studying-Indian-Regional-Biases-in-English-and-Code-Mixed-Social-Media-I/tree/main/fine-tuning/multi-class%20classification).
+We fine-tuned Mistral-7B-v0.3 to address limitations in few-shot learning. The fine-tuned model demonstrated significant improvements across all severity classes compared to the zero-shot baseline. The most substantial gains were observed in the 'Severe' category (Precision increased from 0.360 to 0.586), confirming that training on curated data effectively enhances the detection of high-severity regional bias. The codes for which are, which is available in [multi-class classification](https://github.com/debby123p/IndRegBias-A-Benchmark-for-Studying-Indian-Regional-Biases-in-English-and-Code-Mixed-Social-Media-I/tree/main/fine-tuning/multi-class%20classification).
 
 | Severity Level | Zero-Shot (Precision) | Zero-Shot (F1) | Fine-Tuning (Precision) | Fine-Tuning (F1) |
 | :--- | :---: | :---: | :---: | :---: |
