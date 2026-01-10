@@ -5,7 +5,7 @@ Our goal is to make LLMs aware of regional bias in Indian content and improve th
 
 ## Dataset
 
-A key contribution of this research is a new, culturally specific dataset of user-generated comments for detecting regional bias.
+A key contribution of this research is a new, culturally specific dataset of user-generated comments for detecting regional bias. The dataset is available through [dataset.zip](https://github.com/debby123p/IndRegBias-A-Dataset-for-Studying-Indian-Regional-Biases-in-English-and-Code-Mixed-Social-Media-Com/blob/main/Dataset.zip).
 
 - Data Source: Comments collected from Reddit and YouTube.
 
