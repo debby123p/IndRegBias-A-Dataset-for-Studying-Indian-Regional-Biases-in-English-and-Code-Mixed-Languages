@@ -188,6 +188,15 @@ We fine-tuned Mistral-7B-v0.3 to address limitations in few-shot learning. The f
 
 The transition to IndRegBias marks a significant advancement in the computational analysis and mitigation of regional biases within the Indian context. By expanding the dataset to 25,000 comments, we provide code-mixed and multilingual comments. By ensuring class balance, we provide a robust benchmark that addresses the critical gap in the availability of such datasets. Our comprehensive evaluation of multiple models in zero-shot, few-shot, and fine-tuning settings shows the initial difficulty in inferring regional biases from the comments, which improves with model fine-tuning. The analysis of the data has shed more light on regional biases in India. Furthermore, the inclusion of Indic-centric models and a fine-grained analysis of the results for state/region-level performance highlights which geographic regions performed better or worse, providing a roadmap for developing more culturally aware and inclusive technologies. This work establishes a solid foundation for future research aimed at building fairer AI systems for diverse regional landscapes.
 
+## 📝 Citation
 
+If you find this dataset or code useful in your research, please cite our work:
 
-
+```bibtex
+@article{panda2026indregbias,
+  title={IndRegBias: A Dataset for Studying Indian Regional Biases in English and Code-Mixed Social Media Comments},
+  author={Panda, Debasmita and Anil, Akash and Shukla, Neelesh Kumar},
+  journal={arXiv preprint arXiv:2601.06477},
+  year={2026},
+  url={[https://arxiv.org/abs/2601.06477](https://arxiv.org/abs/2601.06477)}
+}
